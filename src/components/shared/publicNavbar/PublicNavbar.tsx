@@ -10,7 +10,7 @@ import {
 import { ChevronDown, Menu, X } from "lucide-react";
 // import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const categories = [
   { title: "Web Development", href: "/category/web" },
@@ -23,6 +23,17 @@ export function PublicNavbar() {
   const [open, setOpen] = useState(false);
   const [catOpen, setCatOpen] = useState(false);
 
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setOpen(false);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
   return (
     <div className="w-full border-b bg-white shadow-md">
       <div className="container mx-auto flex items-center justify-between py-3 px-2 md:px-4">
@@ -89,8 +100,14 @@ export function PublicNavbar() {
         </div>
 
         {/* MOBILE BUTTON */}
-        <button onClick={() => setOpen(true)} className="md:hidden">
-          <Menu size={24} />
+        <button
+          onClick={() => setOpen(true)}
+          className="md:hidden group relative p-2 rounded-lg bg-white/70 backdrop-blur-md border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300"
+        >
+          <Menu
+            size={22}
+            className="text-gray-700 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300"
+          />
         </button>
 
         {/* MOBILE SIDEBAR */}
@@ -107,9 +124,9 @@ export function PublicNavbar() {
             <div className="w-72 bg-white h-full flex flex-col">
               {/* Header */}
               <div className="flex items-center justify-between p-4 border-b">
-                <span className="font-semibold text-lg">Menu</span>
+                <span className="font-semibold text-lg ">Menu</span>
                 <button onClick={() => setOpen(false)}>
-                  <X />
+                  <X color="red" size={25} />
                 </button>
               </div>
 
@@ -118,7 +135,7 @@ export function PublicNavbar() {
                 <Link
                   href="/"
                   onClick={() => setOpen(false)}
-                  className="px-4 py-3 border-b hover:bg-gray-50"
+                  className="px-4 py-3 border-b hover:bg-gray-50 text-base font-medium"
                 >
                   Home
                 </Link>
@@ -126,7 +143,7 @@ export function PublicNavbar() {
                 <Link
                   href="/menu"
                   onClick={() => setOpen(false)}
-                  className="px-4 py-3 border-b hover:bg-gray-50"
+                  className="px-4 py-3 border-b hover:bg-gray-50 text-base font-medium"
                 >
                   Menu
                 </Link>
@@ -135,7 +152,7 @@ export function PublicNavbar() {
                 <div className="border-b">
                   <button
                     onClick={() => setCatOpen(!catOpen)}
-                    className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50"
+                    className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 text-base font-medium"
                   >
                     <span>Category</span>
 
@@ -154,7 +171,7 @@ export function PublicNavbar() {
                           key={item.title}
                           href={item.href}
                           onClick={() => setOpen(false)}
-                          className="px-6 py-2 text-sm border-t hover:bg-gray-100"
+                          className="px-6 py-2 text-sm border-t hover:bg-gray-100 font-medium"
                         >
                           {item.title}
                         </Link>
@@ -166,7 +183,7 @@ export function PublicNavbar() {
                 <Link
                   href="/dashboard"
                   onClick={() => setOpen(false)}
-                  className="px-4 py-3 border-b hover:bg-gray-50"
+                  className="px-4 py-3 border-b hover:bg-gray-50 text-base font-medium"
                 >
                   Dashboard
                 </Link>
@@ -177,7 +194,7 @@ export function PublicNavbar() {
                 <Link
                   href="/login"
                   onClick={() => setOpen(false)}
-                  className="block w-full text-center px-4 py-3 bg-black text-white rounded-md hover:opacity-90 transition"
+                  className="block w-full text-center px-4 py-3 bg-black text-white rounded-md hover:opacity-90 transition text-base font-medium"
                 >
                   Login
                 </Link>

@@ -1,6 +1,12 @@
 import { LoginForm } from "@/components/login-form";
 
-export default function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ redirect?: string }>;
+}) {
+  const params = (await searchParams) || {};
+
   return (
     <div className="flex min-h-screen items-center justify-center p-2 md:p-4">
       <div className="w-full max-w-md space-y-4 rounded-lg border p-6 md:p-8 shadow-lg bg-white">
@@ -10,7 +16,7 @@ export default function LoginPage() {
             Enter your credentials to access your account
           </p>
         </div>
-        <LoginForm />
+        <LoginForm redirect={params.redirect} />
       </div>
     </div>
   );
