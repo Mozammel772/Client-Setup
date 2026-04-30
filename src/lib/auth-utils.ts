@@ -1,7 +1,5 @@
-export type UserRole = "ADMIN" | "MODERATOR" | "USER";
+export type UserRole = "SUPER_ADMIN" | "ADMIN" | "MODERATOR" | "USER";
 
-// exact : ["/my-profile", "settings"]
-//   patterns: [/^\/dashboard/, /^\/patient/], // Routes starting with /dashboard/* /patient/*
 export type RouteConfig = {
   exact: string[];
   patterns: RegExp[];
@@ -11,22 +9,26 @@ export const authRoutes = ["/login", "/register", "/forgot-password"];
 
 export const commonProtectedRoutes: RouteConfig = {
   exact: ["/my-profile", "/settings", "/change-password", "/reset-password"],
-  patterns: [], // [/password/change-password, /password/reset-password => /password/*]
+  patterns: [],
+};
+
+export const superAdminProtectedRoutes: RouteConfig = {
+  patterns: [/^\/super_admin/],
+  exact: [],
+};
+export const adminProtectedRoutes: RouteConfig = {
+  patterns: [/^\/admin/],
+  exact: [],
 };
 
 export const moderatorProtectedRoutes: RouteConfig = {
-  patterns: [/^\/moderator/], // Routes starting with /doctor/* , /assitants, /appointments/*
-  exact: [], // "/assistants"
-};
-
-export const adminProtectedRoutes: RouteConfig = {
-  patterns: [/^\/admin/], // Routes starting with /admin/*
-  exact: [], // "/admins"
+  patterns: [/^\/moderator/],
+  exact: [],
 };
 
 export const userProtectedRoutes: RouteConfig = {
-  patterns: [/^\/dashboard/], // Routes starting with /dashboard/*
-  exact: [], // "/dashboard"
+  patterns: [/^\/dashboard/],
+  exact: [],
 };
 
 export const isAuthRoute = (pathname: string) => {
@@ -41,12 +43,14 @@ export const isRouteMatches = (
     return true;
   }
   return routes.patterns.some((pattern: RegExp) => pattern.test(pathname));
-  // if pathname === /dashboard/my-appointments => matches /^\/dashboard/ => true
 };
 
 export const getRouteOwner = (
   pathname: string,
-): "ADMIN" | "MODERATOR" | "USER" | "COMMON" | null => {
+): "SUPER_ADMIN" | "ADMIN" | "MODERATOR" | "USER" | "COMMON" | null => {
+  if (isRouteMatches(pathname, superAdminProtectedRoutes)) {
+    return "SUPER_ADMIN";
+  }
   if (isRouteMatches(pathname, adminProtectedRoutes)) {
     return "ADMIN";
   }
@@ -63,6 +67,9 @@ export const getRouteOwner = (
 };
 
 export const getDefaultDashboardRoute = (role: UserRole): string => {
+  if (role === "SUPER_ADMIN") {
+    return "/super_admin/dashboard";
+  }
   if (role === "ADMIN") {
     return "/admin/dashboard";
   }

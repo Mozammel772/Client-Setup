@@ -3,19 +3,19 @@ import { FieldDescription } from "../ui/field";
 
 interface InputFieldErrorProps {
   field: string;
-  state: IInputErrorState;
+  state?: IInputErrorState | null;
 }
 
 const InputFieldError = ({ field, state }: InputFieldErrorProps) => {
-  if (getInputFieldError(field, state)) {
-    return (
-      <FieldDescription className="text-red-600">
-        {getInputFieldError(field, state)}
-      </FieldDescription>
-    );
-  }
+  const errorMessage = getInputFieldError(field, state);
 
-  return null;
+  if (!errorMessage) return null;
+
+  return (
+    <FieldDescription className="text-red-600 text-sm mt-1">
+      {errorMessage}
+    </FieldDescription>
+  );
 };
 
 export default InputFieldError;

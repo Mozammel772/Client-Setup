@@ -23,10 +23,10 @@ export const loginUser = async (
     let accessTokenObject: null | any = null;
     let refreshTokenObject: null | any = null;
     const payload = {
-      email: formData.get("email"),
+      phone: formData.get("phone"),
       password: formData.get("password"),
     };
-
+    console.log(payload);
     if (zodValidator(payload, loginValidationZodSchema).success === false) {
       return zodValidator(payload, loginValidationZodSchema);
     }
@@ -35,7 +35,7 @@ export const loginUser = async (
       payload,
       loginValidationZodSchema,
     ).data;
-
+    console.log(validatedPayload, "sagyyas");
     const res = await serverFetch.post("/auth/login", {
       body: JSON.stringify(validatedPayload),
       headers: {
@@ -44,7 +44,9 @@ export const loginUser = async (
     });
 
     const result = await res.json();
-
+    if (!res.ok || !result.success) {
+      throw new Error(result.message || "Login failed");
+    }
     const setCookieHeaders = res.headers.getSetCookie();
 
     if (setCookieHeaders && setCookieHeaders.length > 0) {
@@ -132,7 +134,7 @@ export const loginUser = async (
     console.log(error);
     return {
       success: false,
-      message: `${process.env.NODE_ENV === "development" ? error.message : "Login Failed. You might have entered incorrect email or password."}`,
+      message: `${process.env.NODE_ENV === "development" ? error.message : "Login Failed. You might have entered incorrect phone or password."}`,
     };
   }
 };

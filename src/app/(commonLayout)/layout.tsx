@@ -1,7 +1,7 @@
 "use client";
 
 import PublicFooter from "@/components/shared/publicFooter/PublicFooter";
-import { PublicNavbar } from "@/components/shared/publicNavbar/PublicNavbar";
+import PublicNavbar from "@/components/shared/publicNavbar/PublicNavbar";
 
 export default function CommonLayout({
   children,

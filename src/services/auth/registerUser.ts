@@ -13,11 +13,10 @@ export const registerUser = async (
   try {
     const payload = {
       name: formData.get("name"),
-      email: formData.get("email"),
+      phone: formData.get("phone"),
       password: formData.get("password"),
       confirmPassword: formData.get("confirmPassword"),
     };
-    console.log("payload", payload);
 
     if (
       zodValidator(payload, registerUserValidationZodSchema).success === false
@@ -31,10 +30,9 @@ export const registerUser = async (
     ).data;
     const registerData = {
       name: validatedPayload.name,
-      email: validatedPayload.email,
+      phone: validatedPayload.phone,
       password: validatedPayload.password,
     };
-    console.log(registerData);
 
     const res = await serverFetch.post("/user/register", {
       headers: { "Content-Type": "application/json" },

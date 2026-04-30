@@ -3,55 +3,55 @@
 
 import { serverFetch } from "@/lib/server-fetch";
 import { UserInfo } from "@/types/user.interface";
-import jwt, { JwtPayload } from "jsonwebtoken";
-import { getCookie } from "./tokenHandlers";
+import { deleteCookie, getCookie } from "./tokenHandlers";
 
-export const getUserInfo = async (): Promise<UserInfo | any> => {
-  let userInfo: UserInfo | any;
+export const getUserInfo = async (): Promise<UserInfo> => {
   try {
+    const accessToken = await getCookie("accessToken");
+
+    if (!accessToken) {
+      throw new Error("NO_TOKEN");
+    }
+
     const response = await serverFetch.get("/user/me", {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
       next: { tags: ["user-info"], revalidate: 180 },
     });
 
     const result = await response.json();
 
-    if (result.success) {
-      const accessToken = await getCookie("accessToken");
-
-      if (!accessToken) {
-        throw new Error("No access token found");
-      }
-
-      const verifiedToken = jwt.verify(
-        accessToken,
-        process.env.JWT_SECRET as string,
-      ) as JwtPayload;
-
-      userInfo = {
-        name: verifiedToken.name || "Unknown User",
-        email: verifiedToken.email,
-        role: verifiedToken.role,
-      };
+    if (!result.success) {
+      throw new Error("API_FAILED");
     }
 
-    userInfo = {
-      name:
-        result.data.admin?.name ||
-        result.data.moderator?.name ||
-        result.data.user?.name ||
-        result.data.name ||
-        "Unknown User",
-      ...result.data,
-    };
+    console.log("current:", result.data?.name);
 
-    return userInfo;
+    return {
+      id: result.data?.id,
+      name: result.data?.name || "Unknown User",
+      phone: result.data?.phone,
+      role: result.data?.userRole || "USER",
+      status: result.data?.status,
+      createdAt: result.data?.createdAt,
+      updatedAt: result.data?.updatedAt,
+    };
   } catch (error: any) {
-    console.log(error);
+    console.log("getUserInfo error:", error.message);
+
+    // 🔥 token cleanup if expired
+    await deleteCookie("accessToken");
+    await deleteCookie("refreshToken");
+
     return {
       id: "",
-      name: "Unknown User",
-      email: "",
+      name: "Guest",
+      phone: "",
       role: "USER",
+      status: "DELETED",
+      createdAt: "",
+      updatedAt: "",
     };
   }
 };

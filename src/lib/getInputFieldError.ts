@@ -5,14 +5,13 @@ export interface IInputErrorState {
     message: string;
   }[];
 }
+
 export const getInputFieldError = (
   fieldName: string,
-  state: IInputErrorState
+  state?: IInputErrorState | null,
 ) => {
-  if (state && state.errors) {
-    const error = state.errors.find((err) => err.field === fieldName);
-    return error ? error.message : null;
-  } else {
-    return null;
-  }
+  if (!state?.errors?.length) return null;
+
+  const error = state.errors.find((err) => err.field === fieldName);
+  return error?.message || null;
 };

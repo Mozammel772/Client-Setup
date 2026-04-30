@@ -41,33 +41,6 @@ export const getCommonNavItems = (role: UserRole): NavSection[] => {
   ];
 };
 
-// export const MODERATORNavItems: NavSection[] = [
-//     {
-//         title: "USER Management",
-//         items: [
-//             {
-//                 title: "Appointments",
-//                 href: "/MODERATOR/dashboard/appointments",
-//                 icon: "Calendar", // ✅ String
-//                 badge: "3",
-//                 roles: ["MODERATOR"],
-//             },
-//             {
-//                 title: "My Schedules",
-//                 href: "/MODERATOR/dashboard/my-schedules",
-//                 icon: "Clock", // ✅ String
-//                 roles: ["MODERATOR"],
-//             },
-//             {
-//                 title: "Prescriptions",
-//                 href: "/MODERATOR/dashboard/prescriptions",
-//                 icon: "FileText", // ✅ String
-//                 roles: ["MODERATOR"],
-//             },
-//         ],
-//     }
-// ]
-
 export const getModeratorNavItems = async (): Promise<NavSection[]> => {
   // Fetch upcoming appointments count (only future appointments)
 
@@ -98,44 +71,6 @@ export const getModeratorNavItems = async (): Promise<NavSection[]> => {
     },
   ];
 };
-
-// export const USERNavItems: NavSection[] = [
-//     {
-//         title: "Appointments",
-//         items: [
-//             {
-//                 title: "My Appointments",
-//                 href: "/dashboard/my-appointments",
-//                 icon: "Calendar", // ✅ String
-//                 roles: ["USER"],
-//             },
-//             {
-//                 title: "Book Appointment",
-//                 href: "/consultation",
-//                 icon: "ClipboardList", // ✅ String
-//                 roles: ["USER"],
-//             },
-//         ],
-//     },
-//     {
-//         title: "Medical Records",
-//         items: [
-//             {
-//                 title: "My Prescriptions",
-//                 href: "/dashboard/my-prescriptions",
-//                 icon: "FileText", // ✅ String
-//                 roles: ["USER"],
-//             },
-//             {
-//                 title: "Health Records",
-//                 href: "/dashboard/health-records",
-//                 icon: "Activity", // ✅ String
-//                 roles: ["USER"],
-//             },
-//         ],
-//     },
-
-// ]
 
 export const getUSERNavItems = async (): Promise<NavSection[]> => {
   // Fetch upcoming appointments count (only future appointments)
@@ -234,6 +169,7 @@ export const getNavItemsByRole = async (
   const commonNavItems = getCommonNavItems(role);
 
   switch (role) {
+    case "SUPER_ADMIN":
     case "ADMIN":
       return [...commonNavItems, ...adminNavItems];
     case "MODERATOR":

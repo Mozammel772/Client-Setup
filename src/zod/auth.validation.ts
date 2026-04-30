@@ -1,68 +1,81 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import z from "zod";
+import { z } from "zod";
 
+/* =========================
+   REGISTER SCHEMA
+========================= */
 export const registerUserValidationZodSchema = z
   .object({
-    name: z.string().min(5, { message: "Name is required" }),
+    name: z.string().min(2, { message: "Name is required" }),
+
+    phone: z.string().regex(/^\+8801\d{9}$/, {
+      message: "Valid Bangladeshi phone required (+8801XXXXXXXXX)",
+    }),
+
     address: z.string().optional(),
-    email: z.email({ message: "Valid email is required" }),
+
     password: z
       .string()
       .min(8, { message: "Password must be at least 8 characters long." })
       .regex(/(?=.*[A-Z])/, {
-        message: "Password must contain at least 1 uppercase letter.",
+        message: "Password must contain 1 uppercase letter.",
       })
       .regex(/(?=.*\d)/, {
-        message: "Password must contain at least 1 number.",
-      })
-      .optional(), // Optional for Google login users
-    confirmPassword: z.string().min(8, {
-      error:
-        "Confirm Password is required and must be at least 8 characters long",
-    }),
+        message: "Password must contain 1 number.",
+      }),
+
+    confirmPassword: z.string().min(6),
   })
-  .refine((data: any) => data.password === data.confirmPassword, {
-    error: "Passwords do not match",
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
     path: ["confirmPassword"],
   });
 
+/* =========================
+   LOGIN SCHEMA (FIXED)
+========================= */
 export const loginValidationZodSchema = z.object({
-  email: z.email({
-    message: "Email is required",
+  phone: z.string().regex(/^\+8801\d{9}$/, {
+    message: "Invalid phone format (+8801XXXXXXXXX)",
   }),
+
   password: z
-    .string("Password is required")
+    .string()
     .min(6, {
-      error: "Password is required and must be at least 6 characters long",
+      message: "Password must be at least 6 characters long",
     })
-    .max(100, {
-      error: "Password must be at most 100 characters long",
-    }),
+    .max(100),
 });
 
+/* =========================
+   RESET PASSWORD
+========================= */
 export const resetPasswordSchema = z
   .object({
     newPassword: z.string().min(6, "Password must be at least 6 characters"),
-    confirmPassword: z
-      .string()
-      .min(6, "Password must be at least 6 characters"),
+    confirmPassword: z.string().min(6),
   })
   .refine((data) => data.newPassword === data.confirmPassword, {
     message: "Passwords don't match",
     path: ["confirmPassword"],
   });
 
+/* =========================
+   FORGOT PASSWORD
+========================= */
 export const forgotPasswordSchema = z.object({
-  email: z.email("Please enter a valid email address"),
+  phone: z.string().regex(/^\+8801\d{9}$/, {
+    message: "Enter valid phone number",
+  }),
 });
 
+/* =========================
+   CHANGE PASSWORD
+========================= */
 export const changePasswordSchema = z
   .object({
-    oldPassword: z.string().min(6, "Password must be at least 6 characters"),
-    newPassword: z.string().min(6, "Password must be at least 6 characters"),
-    confirmPassword: z
-      .string()
-      .min(6, "Password must be at least 6 characters"),
+    oldPassword: z.string().min(6),
+    newPassword: z.string().min(6),
+    confirmPassword: z.string().min(6),
   })
   .refine((data) => data.newPassword === data.confirmPassword, {
     message: "Passwords don't match",

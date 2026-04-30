@@ -5,220 +5,189 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-  navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
-import { ChevronDown, Menu, X } from "lucide-react";
-// import Image from "next/image";
+import { Heart, Search, ShoppingBag, User } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-const categories = [
-  { title: "Web Development", href: "/category/web" },
-  { title: "Design", href: "/category/design" },
-  { title: "Marketing", href: "/category/marketing" },
-  { title: "Business", href: "/category/business" },
-];
+import logo from "@/assets/icons/theme-logo.png";
+import { navbarCategoryData } from "@/lib/navbarData";
+import { getUserInfo } from "@/services/auth/getUserInfo";
+import { UserInfo } from "@/types/user.interface";
+import AuthDropdown from "./AuthDropdown";
+import MobileBottomNav from "./MobileBottomNav";
+import MobileMenuDrawer from "./MobileMenuDrawer";
+import MobileTopNavbar from "./MobileTopNavbar";
+import UserRoleBaseDropdown from "./UserRoleBaseDropdown";
 
-export function PublicNavbar() {
-  const [open, setOpen] = useState(false);
-  const [catOpen, setCatOpen] = useState(false);
+export default function PublicNavbar() {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [activeTab, setActiveTab] =
+    useState<keyof typeof navbarCategoryData>("men");
+  const active = navbarCategoryData[activeTab];
+  const [showAuth, setShowAuth] = useState(false);
+  const [user, setUser] = useState<UserInfo | null>(null);
 
   useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth >= 768) {
-        setOpen(false);
+    getUserInfo().then((data) => {
+      if (data && data.phone) {
+        setUser(data);
+      } else {
+        setUser(null);
       }
-    };
-
-    window.addEventListener("resize", handleResize);
-
-    return () => window.removeEventListener("resize", handleResize);
+    });
   }, []);
   return (
-    <div className="w-full border-b bg-white shadow-md">
-      <div className="container mx-auto flex items-center justify-between py-3 px-2 md:px-4">
-        {/* LOGO */}
-        <Link href="/" className="flex items-center gap-2">
-          {/* <Image
-            src="/logo.png" // 👉 public folder e logo.png dao
-            alt="logo"
-            width={40}
-            height={40}
-            className="object-contain"
-          /> */}
-          <span className="font-semibold text-lg">My Website</span>
-        </Link>
-
-        {/* DESKTOP MENU */}
-        <div className="hidden md:flex items-center gap-2">
-          <NavigationMenu>
-            <NavigationMenuList>
-              <NavigationMenuItem>
-                <NavigationMenuLink
-                  asChild
-                  className={navigationMenuTriggerStyle()}
-                >
-                  <Link href="/">Home</Link>
-                </NavigationMenuLink>
-              </NavigationMenuItem>
-
-              <NavigationMenuItem>
-                <NavigationMenuLink
-                  asChild
-                  className={navigationMenuTriggerStyle()}
-                >
-                  <Link href="/menu">Menu</Link>
-                </NavigationMenuLink>
-              </NavigationMenuItem>
-
-              {/* Category */}
-              <NavigationMenuItem>
-                <NavigationMenuTrigger>Category</NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <ul className="w-56 p-2">
-                    {categories.map((item) => (
-                      <ListItem key={item.title} {...item} />
-                    ))}
-                  </ul>
-                </NavigationMenuContent>
-              </NavigationMenuItem>
-            </NavigationMenuList>
-          </NavigationMenu>
-
-          {/* Dashboard */}
-          <Link href="/dashboard" className={navigationMenuTriggerStyle()}>
-            Dashboard
+    <>
+      <header className="w-full bg-[var(--background)] shadow-sm hidden sm:block">
+        <div className="max-w-[1600px] mx-auto px-2 h-18 flex items-center gap-5 ">
+          {/* Logo */}
+          <Link href="/" className="shrink-0">
+            <Image src={logo} alt="ShopKing" width={120} height={40} priority />
           </Link>
 
-          {/* Login */}
-          <Link
-            href="/login"
-            className="px-4 py-2 rounded-md bg-black text-white text-sm hover:opacity-90 transition"
-          >
-            Login
-          </Link>
-        </div>
+          {/* Menu */}
+          <div className="flex-2 flex justify-end">
+            <NavigationMenu>
+              <NavigationMenuList className="gap-5 font-bold">
+                <NavigationMenuItem>
+                  <NavigationMenuLink asChild>
+                    <Link href="/">Home</Link>
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
 
-        {/* MOBILE BUTTON */}
-        <button
-          onClick={() => setOpen(true)}
-          className="md:hidden group relative p-2 rounded-lg bg-white/70 backdrop-blur-md border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300"
-        >
-          <Menu
-            size={22}
-            className="text-gray-700 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300"
-          />
-        </button>
+                {/* Categories */}
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger className="font-semibold">
+                    Categories
+                  </NavigationMenuTrigger>
 
-        {/* MOBILE SIDEBAR */}
-        {/* MOBILE SIDEBAR */}
-        {open && (
-          <div className="fixed inset-0 z-50 flex">
-            {/* Overlay */}
-            <div
-              className="flex-1 bg-black/40 backdrop-blur-sm"
-              onClick={() => setOpen(false)}
-            />
+                  <NavigationMenuContent>
+                    <div className="w-[900px] p-6 grid grid-cols-4 gap-6 bg-[var(--background)] rounded-xl">
+                      {/* Image */}
+                      <Image
+                        src={active.image}
+                        alt="category"
+                        width={260}
+                        height={320}
+                        className="rounded-lg object-cover"
+                        priority
+                      />
 
-            {/* Sidebar */}
-            <div className="w-72 bg-white h-full flex flex-col">
-              {/* Header */}
-              <div className="flex items-center justify-between p-4 border-b">
-                <span className="font-semibold text-lg ">Menu</span>
-                <button onClick={() => setOpen(false)}>
-                  <X color="red" size={25} />
-                </button>
-              </div>
+                      {/* Right Side */}
+                      <div className="col-span-3">
+                        {/* Tabs */}
+                        <div className="flex gap-6 border-b mb-4">
+                          {(["men", "women", "juniors"] as const).map((tab) => (
+                            <button
+                              key={tab}
+                              onMouseEnter={() => setActiveTab(tab)}
+                              className={`pb-2 capitalize text-base transition-all
+                          ${
+                            activeTab === tab
+                              ? "border-b-2 border-orange-500 text-primary font-semibold"
+                              : "text-gray-500 hover:text-black "
+                          }`}
+                            >
+                              {tab}
+                            </button>
+                          ))}
+                        </div>
 
-              {/* Menu Items */}
-              <div className="flex flex-col">
-                <Link
-                  href="/"
-                  onClick={() => setOpen(false)}
-                  className="px-4 py-3 border-b hover:bg-gray-50 text-base font-medium"
-                >
-                  Home
-                </Link>
-
-                <Link
-                  href="/menu"
-                  onClick={() => setOpen(false)}
-                  className="px-4 py-3 border-b hover:bg-gray-50 text-base font-medium"
-                >
-                  Menu
-                </Link>
-
-                {/* Category Dropdown */}
-                <div className="border-b">
-                  <button
-                    onClick={() => setCatOpen(!catOpen)}
-                    className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 text-base font-medium"
-                  >
-                    <span>Category</span>
-
-                    <ChevronDown
-                      size={18}
-                      className={`transition-transform duration-300 ${
-                        catOpen ? "rotate-180" : ""
-                      }`}
-                    />
-                  </button>
-
-                  {catOpen && (
-                    <div className="flex flex-col bg-gray-50">
-                      {categories.map((item) => (
-                        <Link
-                          key={item.title}
-                          href={item.href}
-                          onClick={() => setOpen(false)}
-                          className="px-6 py-2 text-sm border-t hover:bg-gray-100 font-medium"
-                        >
-                          {item.title}
-                        </Link>
-                      ))}
+                        {/* Columns */}
+                        <div className="grid grid-cols-3 gap-6 text-base">
+                          {Object.entries(active.columns).map(
+                            ([title, items]) => (
+                              <div key={title}>
+                                <h4 className="font-semibold mb-2 border-b">
+                                  {title}
+                                </h4>
+                                <ul className="space-y-1 text-muted-foreground">
+                                  {items.map((item) => (
+                                    <li key={item.name}>
+                                      <Link
+                                        href={item.href}
+                                        className="hover:text-primary-foreground"
+                                      >
+                                        {item.name}
+                                      </Link>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            ),
+                          )}
+                        </div>
+                      </div>
                     </div>
-                  )}
-                </div>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
 
-                <Link
-                  href="/dashboard"
-                  onClick={() => setOpen(false)}
-                  className="px-4 py-3 border-b hover:bg-gray-50 text-base font-medium"
-                >
-                  Dashboard
-                </Link>
-              </div>
+                <NavigationMenuItem>
+                  <NavigationMenuLink asChild>
+                    <Link href="/offers">Offers</Link>
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
+          </div>
 
-              {/* Bottom Login Button */}
-              <div className="mt-auto p-4 border-t">
-                <Link
-                  href="/login"
-                  onClick={() => setOpen(false)}
-                  className="block w-full text-center px-4 py-3 bg-black text-white rounded-md hover:opacity-90 transition text-base font-medium"
-                >
-                  Login
-                </Link>
-              </div>
+          {/* Search */}
+          <div className="flex-1 flex justify-end">
+            <div className="relative w-full max-w-md">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search products..."
+                className="w-full pl-9 pr-3 py-2 rounded-full border text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+              />
             </div>
           </div>
-        )}
-      </div>
-    </div>
-  );
-}
 
-/* Dropdown item (desktop) */
-function ListItem({ title, href }: { title: string; href: string }) {
-  return (
-    <li>
-      <NavigationMenuLink asChild>
-        <Link
-          href={href}
-          className="block px-3 py-2 rounded-md text-sm hover:bg-muted"
-        >
-          {title}
-        </Link>
-      </NavigationMenuLink>
-    </li>
+          {/* Icons */}
+          <div className="flex items-center gap-6">
+            {/* Wishlist */}
+            <Link href="/wishlist" className="relative">
+              <Heart className="h-6 w-6" />
+              <span className="absolute -top-1 -right-1 text-[10px] bg-orange-500 text-white rounded-full px-1">
+                3
+              </span>
+            </Link>
+
+            {/* Cart */}
+            <Link href="/cart" className="relative">
+              <ShoppingBag className="h-6 w-6" />
+              <span className="absolute -top-1 -right-1 text-[10px] bg-orange-500 text-white rounded-full px-1">
+                2
+              </span>
+            </Link>
+            {user && user.phone ? (
+              <UserRoleBaseDropdown user={user} />
+            ) : (
+              <div
+                className="relative"
+                onMouseEnter={() => setShowAuth(true)}
+                onMouseLeave={() => setShowAuth(false)}
+              >
+                {/* User Icon */}
+                <div className="h-9 w-9 rounded-full border flex items-center justify-center cursor-pointer">
+                  <User className="h-5 w-5" />
+                </div>
+
+                {/* Dropdown */}
+                {showAuth && (
+                  <AuthDropdown onClose={() => setShowAuth(false)} />
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      </header>
+      {/* Mobile */}
+      <MobileTopNavbar onMenuClick={() => setMenuOpen(true)} />
+      <MobileMenuDrawer open={menuOpen} onClose={() => setMenuOpen(false)} />
+      <MobileBottomNav />
+    </>
   );
 }
